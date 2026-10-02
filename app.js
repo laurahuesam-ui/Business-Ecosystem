@@ -1,3 +1,4 @@
+const APP_VERSION='Version 3';
 const CLUSTERS={
   'Events & Weddings':'#f4cfc5','Food & Desserts':'#f5d5b8','Products & Brands':'#d9e3d4',
   'Farm & Animals':'#cbd8bc','Travel & Stay':'#c9ddd9','Sales & Distribution':'#efc9a7'
@@ -100,12 +101,23 @@ const seedCandidates=[
  {id:'cand-digital-wedding',name:'Digital Wedding Templates',description:'Digitale Einladungen, Sitzpläne, Menükarten, Checklisten und Planervorlagen zum Download.',status:'Kandidat',clusters:['Events & Weddings','Products & Brands'],target:'Brautpaare und DIY-Hochzeiten',synergies:['Journals & Planer','Eventplanning','Matchies'],resources:'Designsoftware, Shop/Downloadsystem',channels:'Etsy/Online',effort:'Einfach'},
  {id:'cand-event-software',name:'Event Software / Planungstool',description:'Langfristig eigenes digitales Tool für Gäste, Budget, Aufgaben, Sitzplan und Dienstleisterkoordination.',status:'Kandidat',clusters:['Events & Weddings','Products & Brands'],target:'Brautpaare, Eventplaner, Veranstalter',synergies:['Eventplanning','Journals & Planer','Hochzeitslocation'],resources:'Softwareentwicklung, Hosting, Support',channels:'SaaS/Online',effort:'Sehr aufwendig'}
 ];
-const defaultState={businesses:seedBusinesses,connections:seedConnections,candidates:seedCandidates,brainstorm:[],inspiration:[]};
+const DATA_SCHEMA_VERSION=3;
+const defaultState={businesses:seedBusinesses,connections:seedConnections,candidates:seedCandidates,brainstorm:[],inspiration:[],dataSchemaVersion:DATA_SCHEMA_VERSION};
 let state=loadState();let currentPage='dashboard';
 function loadState(){try{return JSON.parse(localStorage.getItem('businessEcoState'))||structuredClone(defaultState)}catch{return structuredClone(defaultState)}}
-function mergeSeedUpdates(){state.businesses=state.businesses||[];state.connections=state.connections||[];state.candidates=state.candidates||[];const hb=seedBusinesses.find(b=>b.id==='hofladen');if(hb&&!state.businesses.some(b=>b.id==='hofladen'||b.name===hb.name))state.businesses.push(structuredClone(hb));seedConnections.filter(c=>['farm','hofladen','airbnb','automaten','matchies','cookies'].includes(c.from)||['hofladen'].includes(c.to)).forEach(c=>{if(!state.connections.some(x=>x.from===c.from&&x.to===c.to&&x.type===c.type))state.connections.push(structuredClone(c))});seedCandidates.forEach(c=>{if(!state.candidates.some(x=>x.id===c.id||x.name===c.name)&&!state.businesses.some(b=>b.name===c.name))state.candidates.push(structuredClone(c))});save()}
-mergeSeedUpdates();
+function migrateState(){
+  state.businesses=state.businesses||[];state.connections=state.connections||[];state.candidates=state.candidates||[];state.brainstorm=state.brainstorm||[];state.inspiration=state.inspiration||[];
+  if((state.dataSchemaVersion||1)<3){
+    seedBusinesses.forEach(b=>{if(!state.businesses.some(x=>x.id===b.id||x.name===b.name))state.businesses.push(structuredClone(b))});
+    seedConnections.forEach(c=>{if(!state.connections.some(x=>x.from===c.from&&x.to===c.to&&x.type===c.type))state.connections.push(structuredClone(c))});
+    seedCandidates.forEach(c=>{if(!state.candidates.some(x=>x.id===c.id||x.name===c.name)&&!state.businesses.some(b=>b.name===c.name))state.candidates.push(structuredClone(c))});
+    state.dataSchemaVersion=DATA_SCHEMA_VERSION;
+    save();
+  }
+}
+migrateState();
 function save(){localStorage.setItem('businessEcoState',JSON.stringify(state))}
+document.addEventListener('DOMContentLoaded',()=>{const v=document.getElementById('appVersion');if(v)v.textContent=APP_VERSION;});
 const pages=[['dashboard','Dashboard'],['businesses','Businesses'],['mindmap','Master Mindmap'],['synergies','Synergien'],['candidates','Kandidaten'],['inspiration','Inspiration'],['brainstorm','Brainstorming'],['implementation','Umsetzung'],['backup','Backup']];
 const nav=document.getElementById('nav');
 pages.forEach(([id,label])=>{const b=document.createElement('button');b.className='nav-btn';b.textContent=label;b.onclick=()=>renderPage(id);b.dataset.page=id;nav.appendChild(b)});
