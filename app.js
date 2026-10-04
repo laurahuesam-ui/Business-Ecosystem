@@ -1,5 +1,5 @@
-const APP_VERSION='Version 9';
-const DATA_SCHEMA_VERSION=9;
+const APP_VERSION='Version 10';
+const DATA_SCHEMA_VERSION=10;
 const CLUSTERS={
   'Events & Weddings':'#f4cfc5','Food & Desserts':'#f5d5b8','Products & Brands':'#d9e3d4',
   'Farm & Animals':'#cbd8bc','Travel & Stay':'#c9ddd9','Sales & Distribution':'#efc9a7','Social & Care':'#d7cfea'
@@ -100,7 +100,7 @@ function migrateState(){
     // Ensure all Version-6 confirmed seed businesses and new connections exist, without deleting any user-created items.
     SEED_DATA.businesses.forEach(b=>{if(!state.businesses.some(x=>x.id===b.id||x.name===b.name))state.businesses.push(clone(b))});
     SEED_DATA.connections.forEach(c=>{if(!state.connections.some(x=>x.id===c.id))state.connections.push(clone(c))});
-    state.dataSchemaVersion=DATA_SCHEMA_VERSION;
+    state.dataSchemaVersion=6;
   }
 
   if((state.dataSchemaVersion||1)<7){
@@ -111,7 +111,7 @@ function migrateState(){
     SEED_DATA.candidates.filter(c=>v7CandidateIds.has(c.id)).forEach(c=>{if(!state.candidates.some(x=>x.id===c.id||x.name===c.name))state.candidates.push(clone(c))});
     const v7ConnectionIds=new Set(['c31','c32','c33','c34','c35','c36','c37','c38','c39','c40','c41','c42','c43']);
     SEED_DATA.connections.filter(c=>v7ConnectionIds.has(c.id)).forEach(c=>{if(!state.connections.some(x=>x.id===c.id))state.connections.push(clone(c))});
-    state.dataSchemaVersion=DATA_SCHEMA_VERSION;
+    state.dataSchemaVersion=7;
   }
 
   if((state.dataSchemaVersion||1)<8){
@@ -120,7 +120,7 @@ function migrateState(){
     SEED_DATA.businesses.filter(b=>v8BusinessIds.has(b.id)).forEach(b=>{if(!state.businesses.some(x=>x.id===b.id||x.name===b.name))state.businesses.push(clone(b))});
     const v8ConnectionIds=new Set(["c44", "c45", "c46", "c47", "c48", "c49"]);
     SEED_DATA.connections.filter(c=>v8ConnectionIds.has(c.id)).forEach(c=>{if(!state.connections.some(x=>x.id===c.id))state.connections.push(clone(c))});
-    state.dataSchemaVersion=DATA_SCHEMA_VERSION;
+    state.dataSchemaVersion=8;
   }
 
 
@@ -128,7 +128,16 @@ function migrateState(){
     // Version 9: add the full new candidate batch, including scalable ecosystem concepts and wellness/experience-gift ideas.
     const v9CandidateIds=new Set(["cand-mobile-food-modules", "cand-event-experience-packages", "cand-event-addon-marketplace", "cand-rental-subscription", "cand-white-label-event", "cand-franchise-food-stations", "cand-diy-kits-shipping", "cand-party-box", "cand-styling-kits-rental", "cand-corporate-event-modules", "cand-employee-boxes", "cand-recognition-platform", "cand-voucher-platform", "cand-farm-membership", "cand-kids-farm-club", "cand-senior-farm-club", "cand-mobile-animal-b2b", "cand-animal-sponsorship-platform", "cand-farm-content-sub", "cand-content-booth", "cand-digital-guestbook", "cand-wedding-website", "cand-event-template-shop", "cand-canva-shop", "cand-pod-stationery", "cand-qr-event-products", "cand-memory-box", "cand-event-cleanup", "cand-styling-crew", "cand-event-logistics", "cand-central-warehouse", "cand-event-fulfillment", "cand-private-label-farm", "cand-farm-online-shop", "cand-seasonal-farm-boxes", "cand-farm-event-calendar", "cand-farm-wedding", "cand-wedding-pet-concierge", "cand-pet-event-styling", "cand-pet-treat-bar", "cand-personalized-pet", "cand-jewelry-kiosk", "cand-bracelet-bar", "cand-corporate-jewelry", "cand-event-staff-pool", "cand-freelancer-marketplace", "cand-event-academy", "cand-licensing", "cand-food-franchise", "cand-central-kitchen", "cand-b2b-dessert", "cand-white-label-grazing", "cand-office-snack-sub", "cand-welcome-bags-fulfillment", "cand-destination-guest-packs", "cand-airbnb-concierge", "cand-airbnb-addon-shop", "cand-venue-addon-shop", "cand-bundle-builder", "cand-spa-airbnb", "cand-wellness-picnic", "cand-private-relax-room", "cand-spa-partner-package", "cand-sauna-suite", "cand-hot-tub", "cand-wellness-workshop"]);
     SEED_DATA.candidates.filter(c=>v9CandidateIds.has(c.id)).forEach(c=>{if(!state.candidates.some(x=>x.id===c.id||x.name===c.name))state.candidates.push(clone(c))});
-    state.dataSchemaVersion=DATA_SCHEMA_VERSION;
+    state.dataSchemaVersion=9;
+  }
+
+  if((state.dataSchemaVersion||1)<10){
+    // Version 10 repair migration: Version 9 was previously released before the full candidate batch was present.
+    // Merge every candidate in the current seed once, preserving existing user-edited candidate records and all other user data.
+    SEED_DATA.candidates.forEach(c=>{
+      if(!state.candidates.some(x=>x.id===c.id||x.name===c.name)) state.candidates.push(clone(c));
+    });
+    state.dataSchemaVersion=10;
   }
 
   state.businesses=uniqById(state.businesses);state.connections=uniqById(state.connections);state.candidates=uniqById(state.candidates);state.offers=uniqById(state.offers);state.packages=uniqById(state.packages);
