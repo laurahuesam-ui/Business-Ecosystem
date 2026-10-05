@@ -1,7 +1,7 @@
 {
   "name":"Business Ecosystem PWA",
   "short_name":"BusinessEco",
-  "start_url":"./index.html?v=13",
+  "start_url":"./index.html?v=14",
   "display":"standalone",
   "background_color":"#fffaf7",
   "theme_color":"#f7e6df",
