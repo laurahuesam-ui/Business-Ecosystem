@@ -1,5 +1,5 @@
-const APP_VERSION='Version 18';
-const DATA_SCHEMA_VERSION=18;
+const APP_VERSION='Version 19';
+const DATA_SCHEMA_VERSION=19;
 const CLUSTERS={
   'Events & Weddings':'#f4cfc5','Food & Desserts':'#f5d5b8','Products & Brands':'#d9e3d4',
   'Farm & Animals':'#cbd8bc','Travel & Stay':'#c9ddd9','Sales & Distribution':'#efc9a7','Social & Care':'#d7cfea'
@@ -317,6 +317,11 @@ function migrateState(){
     state.dataSchemaVersion=18;
   }
 
+
+  if((state.dataSchemaVersion||1)<19){
+    // Version 19 changes only the responsive/mobile navigation. Keep all user data unchanged.
+    state.dataSchemaVersion=19;
+  }
 
   state.todos=uniqById(state.todos||[]);
   state.businesses=uniqById(state.businesses);state.connections=uniqById(state.connections);state.candidates=uniqById(state.candidates);state.offers=uniqById(state.offers);state.packages=uniqById(state.packages);
