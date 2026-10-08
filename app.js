@@ -1,5 +1,5 @@
-const APP_VERSION='Version 22';
-const DATA_SCHEMA_VERSION=22;
+const APP_VERSION='Version 23';
+const DATA_SCHEMA_VERSION=23;
 const CLUSTERS={
   'Events & Weddings':'#f4cfc5','Food & Desserts':'#f5d5b8','Products & Brands':'#d9e3d4',
   'Farm & Animals':'#cbd8bc','Travel & Stay':'#c9ddd9','Sales & Distribution':'#efc9a7','Social & Care':'#d7cfea'
@@ -414,7 +414,7 @@ function offerName(id){return state.offers.find(o=>o.id===id)?.name||id}
 function entityRecord(type,id){if(type==='business')return state.businesses.find(x=>x.id===id);if(type==='offer')return state.offers.find(x=>x.id===id);if(type==='package')return state.packages.find(x=>x.id===id);if(type==='channel')return (state.channels||[]).find(x=>x.id===id);if(type==='candidate')return state.candidates.find(x=>x.id===id);return null}
 function entityImagesHtml(type,id){
   const x=entityRecord(type,id);if(!x)return '';x.images=Array.isArray(x.images)?x.images:[];
-  const cards=x.images.map(img=>`<div class="entity-image-card"><img src="${img.data}" alt="${esc(img.name||x.name||'Bild')}"><div class="row space"><small>${esc(img.name||'Bild')}</small><button class="danger tiny" onclick="deleteEntityImage('${type}','${id}','${img.id}')">×</button></div></div>`).join('');
+  const cards=x.images.map(img=>`<div class="entity-image-card"><img class="entity-image-thumb" src="${img.data}" alt="${esc(img.name||x.name||'Bild')}" onclick="openImageLightbox('${type}','${id}','${img.id}')" title="Zum Vergrößern öffnen"><div class="row space"><small>${esc(img.name||'Bild')}</small><button class="danger tiny" onclick="deleteEntityImage('${type}','${id}','${img.id}')">×</button></div></div>`).join('');
   return `<div class="panel" style="margin-top:16px"><div class="row space"><div><h3>Bilder</h3><small class="muted">Die Bilder werden komprimiert im PWA-Datenbestand gespeichert und sind dadurch im JSON-Backup enthalten.</small></div><label class="secondary image-upload-label">+ Bild(er)<input type="file" accept="image/*" multiple onchange="uploadEntityImages('${type}','${id}',this.files)"></label></div><div class="entity-image-grid">${cards||'<div class="empty">Noch keine Bilder hinterlegt.</div>'}</div></div>`;
 }
 function compressImageFile(file){
@@ -425,6 +425,20 @@ async function uploadEntityImages(type,id,files){
   for(const file of [...files]){try{const data=await compressImageFile(file);x.images.push({id:'img'+Date.now()+Math.random().toString(16).slice(2),name:file.name||'Bild',data,addedAt:new Date().toISOString()})}catch(e){alert('Bild konnte nicht verarbeitet werden: '+(file.name||''))}}
   save();refreshCurrentPage();
 }
+
+function openImageLightbox(type,id,imgId){
+  const x=getEntityRecord(type,id);if(!x)return;
+  const img=(x.images||[]).find(i=>i.id===imgId);if(!img)return;
+  const wrap=document.createElement('div');
+  wrap.className='image-lightbox';
+  wrap.id='imageLightbox';
+  wrap.innerHTML=`<button class="image-lightbox-close" aria-label="Bild schließen" onclick="closeImageLightbox()">×</button><div class="image-lightbox-inner"><img src="${img.data}" alt="${esc(img.name||x.name||'Bild')}"><div class="image-lightbox-caption">${esc(img.name||x.name||'Bild')}</div></div>`;
+  wrap.addEventListener('click',e=>{if(e.target===wrap)closeImageLightbox()});
+  document.body.appendChild(wrap);
+  document.body.classList.add('lightbox-open');
+}
+function closeImageLightbox(){const el=document.getElementById('imageLightbox');if(el)el.remove();document.body.classList.remove('lightbox-open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeImageLightbox()});
 function deleteEntityImage(type,id,imgId){const x=entityRecord(type,id);if(!x)return;x.images=(x.images||[]).filter(i=>i.id!==imgId);save();refreshCurrentPage()}
 
 function entityName(type,id){if(type==='general')return 'Allgemein';return entityRecord(type,id)?.name||'Unbekannt'}

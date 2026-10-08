@@ -39,3 +39,15 @@ button.tiny{padding:3px 8px;min-height:auto}
 .implementation-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
 button:disabled{opacity:.4;cursor:not-allowed}
 @media(max-width:700px){.entity-image-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.implementation-item{align-items:flex-start}.implementation-actions{width:100%;justify-content:flex-start}}
+
+/* Version 23: Bild-Großansicht / Lightbox */
+.entity-image-thumb{cursor:zoom-in;transition:transform .15s ease,box-shadow .15s ease}
+.entity-image-thumb:hover{transform:scale(1.01);box-shadow:0 5px 18px rgba(0,0,0,.12)}
+.image-lightbox{position:fixed;inset:0;z-index:1000;background:rgba(18,16,15,.92);display:flex;align-items:center;justify-content:center;padding:28px;cursor:zoom-out}
+.image-lightbox-inner{max-width:min(96vw,1500px);max-height:94vh;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:default}
+.image-lightbox-inner img{display:block;max-width:100%;max-height:86vh;width:auto;height:auto;object-fit:contain;border-radius:12px;box-shadow:0 20px 70px rgba(0,0,0,.45);background:#111}
+.image-lightbox-caption{color:#fff;font-size:14px;text-align:center;max-width:90vw}
+.image-lightbox-close{position:fixed;top:16px;right:18px;width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:30px;line-height:1;cursor:pointer;z-index:1001}
+.image-lightbox-close:hover{background:rgba(255,255,255,.28)}
+body.lightbox-open{overflow:hidden}
+@media(max-width:640px){.image-lightbox{padding:12px}.image-lightbox-inner img{max-height:82vh}.image-lightbox-close{top:10px;right:10px}}
