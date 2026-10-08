@@ -1,4 +1,4 @@
-const APP_VERSION='Version 23';
+const APP_VERSION='Version 24';
 const DATA_SCHEMA_VERSION=23;
 const CLUSTERS={
   'Events & Weddings':'#f4cfc5','Food & Desserts':'#f5d5b8','Products & Brands':'#d9e3d4',
@@ -427,7 +427,7 @@ async function uploadEntityImages(type,id,files){
 }
 
 function openImageLightbox(type,id,imgId){
-  const x=getEntityRecord(type,id);if(!x)return;
+  const x=entityRecord(type,id);if(!x)return;
   const img=(x.images||[]).find(i=>i.id===imgId);if(!img)return;
   const wrap=document.createElement('div');
   wrap.className='image-lightbox';
